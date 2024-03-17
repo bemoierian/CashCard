@@ -8,10 +8,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 //This will start our Spring Boot application and make it available for our test to perform requests to it.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+//This will reset the state of the database after each test method is run.
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class CashCardApplicationTests {
 //	We've asked Spring to inject a test helper that’ll allow us to make HTTP requests
 //	to the locally running application.
@@ -45,5 +50,27 @@ class CashCardApplicationTests {
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 		assertThat(response.getBody()).isBlank();
+	}
+	@Test
+	void shouldCreateANewCashCard() {
+		// Create a new cash card
+		CashCard newCashCard = new CashCard(null, 250.00);
+		// Send a POST request to the /cashcards endpoint
+		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/cashcards", newCashCard, Void.class);
+		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+		//The origin server SHOULD send a 201 (Created) response
+		// containing a Location header field that provides an identifier for the primary resource created
+		// in other words, information for how to retrieve that resource
+		// Get the URI for the location of the new cash card
+		URI locationOfNewCashCard = createResponse.getHeaders().getLocation();
+		// Send a GET request to the location of the new cash card
+		ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewCashCard, String.class);
+		assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+		// Verify that the new cash card has the correct amount
+		DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+		Number id = documentContext.read("$.id");
+		Double amount = documentContext.read("$.amount");
+		assertThat(id).isNotNull();
+		assertThat(amount).isEqualTo(250.00);
 	}
 }
