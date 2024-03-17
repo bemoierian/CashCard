@@ -52,5 +52,17 @@ class CashCardController {
         // Return a 201 Created status code
         return ResponseEntity.created(locationOfNewCashCard).build();
     }
+    @GetMapping
+    private ResponseEntity<List<CashCard>> findAll(Pageable pageable) {
+        // Pageable is another object that Spring Web provides for us.
+        // Since we specified the URI parameters of page=0&size=1, pageable will contain the values we need
+        Page<CashCard> page = cashCardRepository.findAll(
+                PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize(),
+                        pageable.getSortOr(Sort.by(Sort.Direction.ASC, "amount"))
+                ));
+        return ResponseEntity.ok(page.getContent());
+    }
 
 }
