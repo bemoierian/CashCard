@@ -23,26 +23,37 @@ class SecurityConfig {
 //        We can use the HttpSecurity object to configure the security of our application.
 //        All HTTP requests to cashcards/ endpoints are required
 //        to be authenticated using HTTP Basic Authentication security (username and password).
+//        We also require that the authenticated user has the role CARD-OWNER.
 //        Also, do not require CSRF security.
+//        Use CSRF protection for any request that could be processed by a browser by normal users.
+//        If you are only creating a service that is used by non-browser clients,
+//        you will likely want to disable CSRF protection.
         http
-                .authorizeHttpRequests(request -> request
-                        .requestMatchers("/cashcards/**")
-                        .authenticated())
-                .httpBasic(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable());
+            .authorizeHttpRequests(request -> request
+                    .requestMatchers("/cashcards/**")
+                    .hasRole("CARD-OWNER"))
+            .httpBasic(Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable());
         return http.build();
     }
 //    Spring Security expects a Bean to configure the users that are allowed to authenticate with our application.
-//    This is a simple in-memory user store with a single user.
     @Bean
     UserDetailsService testOnlyUsers(PasswordEncoder passwordEncoder) {
+//    This is a simple in-memory user store with two users.
+//    The first user, sarah1, has the role CARD-OWNER.
         User.UserBuilder users = User.builder();
         UserDetails sarah = users
                 .username("sarah1")
                 .password(passwordEncoder.encode("abc123"))
-                .roles() // No roles for now
+                .roles("CARD-OWNER") // new role
                 .build();
-        return new InMemoryUserDetailsManager(sarah);
+//    The second user, hank-owns-no-cards, has the role NON-OWNER.
+        UserDetails hankOwnsNoCards = users
+                .username("hank-owns-no-cards")
+                .password(passwordEncoder.encode("qrs456"))
+                .roles("NON-OWNER") // new role
+                .build();
+        return new InMemoryUserDetailsManager(sarah, hankOwnsNoCards);
     }
 
     @Bean
