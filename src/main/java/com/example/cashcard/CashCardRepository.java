@@ -14,4 +14,5 @@ interface CashCardRepository extends CrudRepository<CashCard, Long>, PagingAndSo
 //    We don't need to write any code for them. We just need to define the method signature and Spring Data will provide the implementation.
     CashCard findByIdAndOwner(Long id, String owner);
     Page<CashCard> findByOwner(String owner, PageRequest pageRequest);
+    boolean existsByIdAndOwner(Long id, String owner);
 }
