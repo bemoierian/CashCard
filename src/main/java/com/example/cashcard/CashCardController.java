@@ -31,9 +31,10 @@ class CashCardController {
 
         // Find a cash card in the database by its id
         // Optional: a container object which may or may not contain a non-null value
-        Optional<CashCard> cashCardOptional = Optional.ofNullable(cashCardRepository.findByIdAndOwner(requestedId, principal.getName()));        if (cashCardOptional.isPresent()) {
+        CashCard cashCard = cashCardRepository.findByIdAndOwner(requestedId, principal.getName());
+        if (cashCard != null) {
             // If the cash card is found, return it with a 200 OK status code
-            return ResponseEntity.ok(cashCardOptional.get());
+            return ResponseEntity.ok(cashCard);
         } else {
             // If the cash card is not found, return a 404 Not Found status code
             return ResponseEntity.notFound().build();
