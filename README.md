@@ -33,7 +33,7 @@ git clone https://github.com/bemoierian/CashCard.git
 2. Navigate to the project directory:
 
 ```bash
-cd cash-card-app
+cd CashCard
 ```
 
 3. Build the project using Gradle:
