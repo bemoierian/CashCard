@@ -1,5 +1,6 @@
-package com.example.cashcard;
+package com.example.cashcard.repository;
 
+import com.example.cashcard.model.CashCard;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.CrudRepository;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 //CashCard: This is the entity that we want to manage. Spring Data will provide us with methods to save, update, delete, and find CashCard entities.
 //Long: This is the type of the primary key of the CashCard entity. In this case, it's a Long.
-interface CashCardRepository extends CrudRepository<CashCard, Long>, PagingAndSortingRepository<CashCard, Long> {
+public interface CashCardRepository extends CrudRepository<CashCard, Long>, PagingAndSortingRepository<CashCard, Long> {
 //    We don't need to write any code for them. We just need to define the method signature and Spring Data will provide the implementation.
     CashCard findByIdAndOwner(Long id, String owner);
     Page<CashCard> findByOwner(String owner, PageRequest pageRequest);

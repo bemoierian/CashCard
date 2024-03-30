@@ -1,5 +1,6 @@
 package com.example.cashcard;
 
+import com.example.cashcard.model.CashCard;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
